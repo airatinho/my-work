@@ -1,0 +1,63 @@
+#-*-coding: utf-8 -*-
+import pymssql
+import pandas as pd
+
+import matplotlib.pyplot as plt
+def all_month(a):
+    conn=pymssql.connect(server="database",user="login",password="password",database="databasename",charset="utf8")
+    cur = conn.cursor()
+    cur.execute("select [Месяц продажи], sum([Цена билета])FROM [tablename].[dbo].[databasename] group by [Месяц продажи]")
+    rows = [row for row in cur] # наверняка можно умнее
+    df = pd.DataFrame(rows)
+    x=df[0]
+    y=df[1]
+    plt.figure(figsize=(15,10))
+    plt.bar(x,y,color='darkcyan',width=0.95)
+    plt.grid(True,linewidth=0.1)
+    plt.xticks(rotation=45,color='blue',size=14)
+    plt.yticks(color='firebrick',size=14)
+    plt.xlabel(u"Дата",color='red',size=16)
+    plt.ylabel(u"Сумма денег",color='red',size=16)
+    plt.title(u"Динамика срубленного бабла",size=18)
+
+    for i in range(len(y)): #подписи данных по каждой колонке
+       plt.text(x[i],y[i]-100000,'{0:,}'.format(round(y[i],0)).replace(',', ' ')+ u' \u20BD',rotation=0,size=20,verticalalignment='bottom',horizontalalignment='center',color='gold')
+       #со степенью plt.text(x[i],y[i]-100000,str(round(y[i]/10000,0))+u'*10\u2074'+ u' \u20BD',rotation=0,size=20,verticalalignment='bottom',horizontalalignment='center',color='gold')
+    # plt.subplot(kind='line',z)
+    # plt.ylabel(text='1')
+    # plt.xlabel(color='red')
+    # plt.figure(figsize=(6*3.13,4*3.13))
+    plt.autoscale(True)
+    plt.show()
+def chosen_month(b):
+    conn=pymssql.connect(server="database",user="login",password="password",database="databasename",charset="utf8")
+    cur = conn.cursor()
+    cur.execute("select [День продажи], sum([Цена билета])FROM [tablename].[dbo].[databasename] where [Месяц продажи]='Февраль' group by [День продажи] order by [День продажи] asc")
+    rows = [row for row in cur] # наверняка можно умнее
+    df = pd.DataFrame(rows)
+    print(df)
+    x=df[0]
+    y=df[1]
+    plt.figure(figsize=(11,10))
+    plt.bar(x,y,color='darkcyan',width=0.96)
+    plt.grid(True,linewidth=0.1)
+    plt.xticks(x,rotation=0,color='blue',size=15)
+    plt.yticks(color='firebrick',size=15)
+    plt.xlabel(u"Дата",color='red',size=16)
+    plt.ylabel(u"Сумма денег",color='black',size=16)
+    plt.title(u"Динамика срубленного бабла",size=18)
+    plt.autoscale(True)
+    print(type(x[1]))
+
+    for i in range(len(y)): #подписи данных покаждой колонке
+        plt.text(x[i], y[i] - 10000,'{0:,}'.format(y[i]).replace(',', ' ')+ u' \u20BD', rotation=0, size=8,verticalalignment='bottom', horizontalalignment='center', color='gold')
+       #показатель степени plt.text(x[i],y[i]-10000,str(round(y[i]/10000,0))+u'*10\u00B3'+ u' \u20BD',rotation=0,size=8,verticalalignment='bottom',horizontalalignment='center',color='gold')
+    # plt.subplot(kind='line',z)
+    # plt.ylabel(text='1')
+    # plt.xlabel(color='red')
+    # plt.figure(figsize=(6*3.13,4*3.13))
+    plt.autoscale(True)
+    plt.show()
+#all_month(1)
+chosen_month(1)
+# all_month(1)
