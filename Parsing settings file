@@ -1,0 +1,27 @@
+import pandas as pd
+import scipy as sp
+df=pd.read_fwf('Proxy.txt')
+#x=df[:,1]
+a=df.columns = ["IP","HTTP","SOCKS5","Date","Time"]
+#print(df)
+#print(df.SOCKS5)
+new_array=sp.array(df)
+IP=new_array[:,0]
+HTTP=new_array[:,1]
+SOCKS5=new_array[:,2]
+Date=new_array[:,3]
+Time=new_array[:,4]
+print(Time)
+
+#b=df.columns.pop()
+
+f=open('12.json','w')
+for i in range(0,len(df)+1):
+    data_01 = f.write('\n {')
+    data_02 = f.write('\n "proxy_type" : "https" ')
+    data_03 = f.write('\n "address": ' +'"'+str(df.IP[i])+'",')
+    data_04 = f.write('\n "port": ' +str(df.HTTP[i])+',')
+    data_05 = f.write('\n "url": ' +'"https://'+str(df.SOCKS5[i])+'",')
+    data_06 = f.write('\n "expiration_date" : ISODATE("'+  str(df.Date[i]) +str(df.Time[i]) + '"),')
+    data_07 = f.write('\n }')
+
