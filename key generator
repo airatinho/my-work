@@ -1,0 +1,11 @@
+from bit import Key
+PATTERN = 'PyWay'
+def predicate(addr: str):
+ # первый символ – ID сети, пропустим его
+    return addr[1:].startswith(PATTERN)
+while True:
+    k = Key()  #  новый случайны ключ
+    if predicate(k.segwit_address):
+        print(f'{k.segwit_address} with WIF private key {k.to_wif()}')
+        break
+    print(k)
