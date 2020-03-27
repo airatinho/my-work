@@ -1,0 +1,68 @@
+A=['Рубин - Цска','Рубин - Динамо','Рубин - Ахмат']
+def ayratinho(n):
+    if n==1:
+        return 'Детский'
+    elif n==2:
+        return 'Льготный'
+    elif n==3:
+        return 'Взрослый'
+def match_name(i):
+    if i<=3:
+        return A[0]
+    elif i%3==1:
+        return A[0]
+    elif i%3==2:
+        return A[1]
+    elif i%3==0:
+        return A[2]
+
+def match_price(a):
+    if a==1:
+        return '100'
+    elif a==2:
+        return '200'
+    elif a==3:
+        return '250'
+f=open('15.xml','w', encoding="utf-8")
+data_01=f.write('<?xml version="1.0" encoding="utf-8"?>')
+data_02=f.write('\n<yml_catalog date="2019-07-19 12:15:00">')
+data_03=f.write('\n    <shop>')
+data_04=f.write('\n         <name>Инфоматика</name>')
+data_05=f.write('\n         <company>Инфоматика</company>')
+data_06=f.write('\n         <categories>')
+data_07=f.write('\n             <category id="59">Агентское мероприятие</category>')
+data_08=f.write('\n             <category id="9">Биткойн</category>')
+data_09=f.write('\n             <category id="7">Концерт тестовый</category>')
+data_10=f.write('\n             <category id="41">Массовые катания</category>')
+data_11=f.write('\n             <category id="64">Новое мероприятие</category>')
+data_12=f.write('\n             <category id="11">Суперкубок легенд</category>')
+data_13=f.write('\n             <category id="6">Тест</category>')
+data_14=f.write('\n             <category id="76">Тестовая Айрат</category>')
+data_15=f.write('\n             <category id="58">тестовая1</category>')
+data_16=f.write('\n             <category id="66">Тестовая2</category>')
+data_17=f.write('\n             <category id="65">тестовая3</category>')
+data_18=f.write('\n             <category id="54">Тестовая122</category>')
+data_19=f.write('\n             <category id="77">Домашние матчи Рубина</category>')
+data_20=f.write('\n             <category id="78">Абонемент на сезон</category>')
+data_21=f.write('\n         </categories>')
+data_22=f.write('\n         <offers>')
+data_2=f.write('\n         ')
+for i in range(10000):
+    for n in range(1,4):
+        data=f.write('\n             <offer id="'+str(i+1)+'-'+str(n)+'" productId="'+str(i+1)+'" quantity="1">')
+        data1=f.write('\n                <price>'+str(match_price(n))+'</price> ')
+        data2=f.write('\n                <categoryId>11</categoryId> ')
+        data3=f.write('\n                <name>'+str(ayratinho(n))+'</name> ')
+        data4=f.write('\n                <productName>'+str(match_name(i))+'</productName> ')
+        data5=f.write('\n                <param name="Площадка" code="place">Казань Арена</param> ')
+        data6=f.write('\n                <param name="Жанр" code="action">Футбол</param> ')
+        data7=f.write('\n                <param name="Начало" code="stime">25.08.19 Вс, 14:00</param> ')
+        data8=f.write('\n                <vendor>"Казань Арена"</vendor> ')
+        data9=f.write('\n                <param name="Окончание" code="etime">25.08.19 Пн, 16:00</param> ')
+        data10=f.write('\n                <unit code="tick" name="Билет" sym="шт." /> ')
+        data11=f.write('\n                <vatRate>none</vatRate> ')
+        data12=f.write('\n             </offer> ')
+        data13 = f.write('\n ')
+data_24=f.write('\n        </offers>')
+data_25=f.write('\n    </shop>')
+data_26=f.write('\n</yml_catalog>')
