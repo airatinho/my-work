@@ -1,0 +1,59 @@
+# Turnstile passage counting machine
+# -*-coding: utf-8 -*-
+import pandas as pd
+import scipy as sp
+import os
+df=pd.read_excel(u'C:\\Users\\Admin\\PycharmProjects\\NEU\\ayl.xlsx',encoding='utf8', error_bad_lines=False, header=None,
+                 names=['number','state','ID','TID'])
+
+df_conv=sp.array(df)
+df_1=pd.DataFrame(df_conv)
+num=df_1[0]
+state=df_1[1]
+id=df_1[2]
+tid=df_1[3]
+
+turns=sp.unique(id)
+turns=sp.array(turns)
+count=[0]*112
+suc=[0]*112
+total=sp.column_stack((turns,sp.array(count).T,sp.array(suc).T))
+new_df=pd.DataFrame(total,columns=['turnstiles','num of transactions','success transactions'])
+turnstile=new_df['turnstiles']
+total_count=new_df['num of transactions']
+suc_trans=new_df['success transactions']
+# print(new_df[1])
+# new_df.loc[1]=total_count1              #добавление нового столбца
+
+
+
+for i in range(len(turns)):
+
+    for k in range(len(id)):
+        if turnstile[i]==id[k]:
+            total_count.iloc[i]=total_count[i]+num[k]
+            if state[k]==1:
+                suc_trans.iloc[i] =suc_trans[i]+round((num[k]) / (total_count[i]), 5)
+
+print(new_df)
+
+# for m in range(len(turns)):
+#     if state[m]==1:
+#             suc_trans.iloc[m]=round((num[m]) / (total_count[m]),5)
+# print(new_df)
+#
+
+
+# print(new_df)
+# print(df[0])
+# x=new_df[:,0]
+# print(sp.shape(new_df))
+# p = os.path.abspath(u"ay.xlsx ")
+# print(p)
+#print(df)
+#print(df.SOCKS5)
+
+
+
+
+#b=df.columns.pop()
