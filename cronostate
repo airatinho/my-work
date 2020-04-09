@@ -1,0 +1,84 @@
+# -*-coding: utf-8 -*-
+import pandas as pd
+import scipy as sp
+import ipywidgets as widgets
+from ipywidgets import interact
+import matplotlib.pyplot as plt
+
+pd.set_option('display.max_columns', None)
+
+# Загружаем данные
+url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/'
+confirmed = pd.read_csv(url + 'time_series_covid19_confirmed_global.csv', sep = ',')
+deaths = pd.read_csv(url + 'time_series_covid19_deaths_global.csv', sep = ',')
+recovered = pd.read_csv(url + 'time_series_covid19_recovered_global.csv', sep = ',')
+
+# Пишем даты по-человечески в формате 'dd.mm.yy'
+new_cols = list(confirmed.columns[:4]) + list(confirmed.columns[4:].map(lambda x: '{0:02d}.{1:02d}.{2:d}'.format(int(x.split(sep='/')[1]), int(x.split(sep='/')[0]), int(x.split(sep='/')[2]))))
+confirmed.columns = new_cols
+recovered.columns = new_cols
+deaths.columns = new_cols
+
+# Формируем таблицы с ежедневными приращениями
+confirmed_daily = confirmed.copy()
+confirmed_daily.iloc[:,4:] = confirmed_daily.iloc[:,4:].diff(axis=1)
+deaths_daily = deaths.copy()
+deaths_daily.iloc[:,4:] = deaths_daily.iloc[:,4:].diff(axis=1)
+recovered_daily = recovered.copy()
+recovered_daily.iloc[:,4:] = recovered_daily.iloc[:,4:].diff(axis=1)
+
+# Формируем таблицу со сглаженными ежедневными приращениями заболевших
+smooth_conf_daily = confirmed_daily.copy()
+smooth_conf_daily.iloc[:,4:] = smooth_conf_daily.iloc[:,4:].rolling(window=8, min_periods=2, center=True, axis=1).mean()
+smooth_conf_daily.iloc[:,4:] = smooth_conf_daily.iloc[:,4:].round(1)
+b=pd.DataFrame(smooth_conf_daily.iloc[:,4:].T)
+b.to_excel('crono.xlsx',encoding='utf-8',index=True,sheet_name=u"Статистика",header=None)
+pr_df=pd.read_excel(f'crono.xlsx',header=None)
+df=pd.DataFrame(pr_df)
+df1=sp.array(df)
+new_df=pd.DataFrame(df1)
+# print(smooth_conf_daily.T[0])
+# print(new_df[0])
+# Определяем последнюю дату, на которую есть данные
+last_date = confirmed.columns[-1]
+date=new_df[0]
+
+# Определяем 20 стран с максимальным количеством подтвержденных случаев заражения
+confirmed_top = confirmed.iloc[:, [1, -1]].groupby('Country/Region').sum().sort_values(last_date, ascending = False).head(20)
+countries = list(confirmed_top.index)
+
+# Определяем, какую долю зараженных дают эти 20 стран
+conf_tot_ratio = confirmed_top.sum() / confirmed.iloc[:, 4:].sum()[-1]
+
+# Добавляем к списку Россию
+countries.append('Russia')
+
+# Формируем легенду с колчеством подтвержденных случаев зараженных, вылечившихся и умерших
+l1 = 'Заражено ' + last_date + ' - ' + str(confirmed.iloc[:, 4:].sum()[-1])
+l2 = 'Вылечено ' + last_date + ' - ' + str(recovered.iloc[:, 4:].sum()[-1])
+l3 = 'Сдохло ' + last_date + ' - ' + str(deaths.iloc[:, 4:].sum()[-1])
+all_summ=deaths.iloc[:, 4:]+recovered.iloc[:, 4:]+confirmed.iloc[:, 4:]
+# print(confirmed.iloc[:, 4:])
+# Выводим на графике три суммарные кривые
+ax=plt.figure(figsize = [20,15],facecolor='k')
+plt.rcParams['axes.facecolor'] = 'k'
+# ax.set_facecolor('xkcd:black')
+# ax.set_facecolor((1.0,0.47,0.42))
+# plt.bar(date,deaths.iloc[:, 4:].sum(),width=0.9, color ='red')
+gr1=plt.bar(date,recovered.iloc[:, 4:].sum(),bottom=confirmed.iloc[:, 4:].sum(),width=0.9,color='gold')
+# plt.bar(date,deaths.iloc[:, 4:].sum(),bottom=confirmed.iloc[:, 4:].sum(),width=0.9, color = 'red')
+gr2=plt.bar(date,confirmed.iloc[:, 4:].sum(), width=0.9, color = 'blue')
+gr3=plt.bar(date,deaths.iloc[:, 4:].sum(), width=0.9,color = 'darkred')
+plt.plot(all_summ.iloc[:, 4:].sum(),color='red',linewidth=1.9)
+plt.grid(True,linewidth=0.3)
+plt.autoscale()
+plt.xticks(rotation=65,color='skyblue',size=14)
+plt.yticks(color='firebrick',size=18)
+legend=plt.legend((gr1,gr2,gr3),(u"Вылечено",u"Заражено",u"Померло"),fontsize=18)
+plt.setp(legend.get_texts(), color='w')
+# ax.legend(loc = 'upper left', prop=dict(size=12))
+# ax.xaxis.grid(which='minor')
+# ax.yaxis.grid()
+# ax.tick_params(axis = 'x', labelrotation = 90)
+plt.title('COVID-19 во всех странах . Top 20 стран составляет {:.2%} от общего числа зараженных.'.format(conf_tot_ratio[0]),size=18, color='white')
+plt.show()
